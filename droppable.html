@@ -186,7 +186,7 @@ $('#example-destroy').droppable('destroy'){% endhighlight %}
 
 <h2>Events</h2>
 
-<h2>activate(event, ui)</h2>
+<h2>droppable:activate(event, ui)</h2>
 <p>Triggered when an accepted draggable starts dragging.</p>
 <dl class="inline">
   <dt>ui.item</dt>
@@ -209,10 +209,10 @@ alert(42)
   })
 </script>
 
-<h2>create(event)</h2>
+<h2>droppable:create(event)</h2>
 <p>Triggered when the droppable is created.</p>
 
-<h2>deactivate(event, ui)</h2>
+<h2>droppable:deactivate(event, ui)</h2>
 <p>Triggered when an accepted draggable stops dragging.</p>
 <dl class="inline">
   <dt>ui.item</dt>
