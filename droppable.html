@@ -194,7 +194,7 @@ $('#example-destroy').droppable('destroy'){% endhighlight %}
 </dl>
 <h4>Example</h4>
 {% highlight js %}$('#example-activate').droppable({ accept: '.c' })
-.on('activate', function(e, ui) {
+.on('droppable:activate', function(e, ui) {
 alert(42)
 }){% endhighlight %}
 <div class="draggable c">c</div>
@@ -203,7 +203,7 @@ alert(42)
 <script type="text/javascript">
   $(function() {
     $('#example-activate').droppable({ accept: '.c' })
-    .on('activate', function(e, ui) {
+    .on('droppable:activate', function(e, ui) {
       alert(42)
     })
   })
@@ -220,7 +220,7 @@ alert(42)
 </dl>
 <h4>Example</h4>
 {% highlight js %}$('#example-deactivate').droppable({ accept: '.e' })
-.on('deactivate', function(e, ui) {
+.on('droppable:deactivate', function(e, ui) {
 alert(42)
 }){% endhighlight %}
 <div class="draggable e">e</div>
@@ -229,7 +229,7 @@ alert(42)
 <script type="text/javascript">
   $(function() {
     $('#example-deactivate').droppable({ accept: '.e' })
-    .on('deactivate', function(e, ui) {
+    .on('droppable:deactivate', function(e, ui) {
       alert(42)
     })
   })
