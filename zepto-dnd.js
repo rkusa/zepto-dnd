@@ -463,8 +463,8 @@
     this.index = dragging.el.index()
     
     if (this.opts.forcePlaceholderSize) {
-      this.placeholder.height(dragging.el.height())
-      this.placeholder.width(dragging.el.width())
+      this.placeholder.height(parseFloat(dragging.el.css('height')))
+      this.placeholder.width(parseFloat(dragging.el.css('width')))
     }
     
     this.el.trigger('dragging:start', { item: dragging.el })
@@ -485,8 +485,8 @@
       return
 
     if (this.opts.forcePlaceholderSize) {
-      this.placeholder.height(dragging.el.height())
-      // this.placeholder.width(dragging.el.width())
+      this.placeholder.height(parseFloat(dragging.el.css('height')))
+      // this.placeholder.width(parseFloat(dragging.el.css('width')))
     }
 
     if (!isContainer) {
