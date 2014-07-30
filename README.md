@@ -2,10 +2,7 @@
 
 HTML5 Drag'n'Drop API based Draggable, Droppable and Sortable for [Zepto.js](https://github.com/madrobby/zepto) (and jQuery). For Zepto, you have to include its `data` module.
 
-```json
-{ "name": "zepto-dnd",
-  "version": "1.0.0" }
-```
+[![NPM][npm]](https://npmjs.org/package/zepto-dnd)
 
 **Documentation:** [ma.rkusa.st/zepto-dnd](http://ma.rkusa.st/zepto-dnd)
 
@@ -20,3 +17,5 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[npm]: http://img.shields.io/npm/v/zepto-dnd.svg?style=flat
