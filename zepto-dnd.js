@@ -267,11 +267,14 @@
     if (this.opts.disabled) return false
     
     e.stopPropagation()
-    
+    e = e.originalEvent || e // zepto <> jquery compatibility
+
     // hide placeholder, if set (e.g. enter the droppable after
     // entering a sortable)
-    if (dragging.placeholder) dragging.placeholder.hide()
-    
+    if (dragging.placeholder && !(e.dataTransfer.effectAllowed === 'copyMove' && this.opts.clone)) {
+      dragging.placeholder.hide()
+    }
+
     if (this.opts.hoverClass && this.accept)
       this.el.addClass(this.opts.hoverClass)
   }
@@ -675,7 +678,8 @@
     disabled: false,
     hoverClass: false,
     initialized: false,
-    scope: 'default'
+    scope: 'default',
+    clone: false
   })
   
   $.fn.sortable = generic(Sortable, 'sortable', {
