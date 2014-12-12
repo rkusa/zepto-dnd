@@ -301,7 +301,7 @@
     if (this.opts.disabled) return false
 
     e.stopPropagation() // stops the browser from redirecting.
-    // e.preventDefault()
+    e.preventDefault()
 
     if (!dragging.el) return
 
