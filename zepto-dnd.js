@@ -271,7 +271,8 @@
 
     // hide placeholder, if set (e.g. enter the droppable after
     // entering a sortable)
-    if (dragging.placeholder && !(e.dataTransfer.effectAllowed === 'copyMove' && this.opts.clone)) {
+    // (toLowerCase() is a IE fix)
+    if (dragging.placeholder && !(e.dataTransfer.effectAllowed.toLowerCase() === 'copymove' && this.opts.clone)) {
       dragging.placeholder.hide()
     }
 
@@ -310,8 +311,9 @@
     // zepto <> jquery compatibility
     if (e.originalEvent) e = e.originalEvent
 
-    switch (e.dataTransfer.effectAllowed) {
-      case 'copyMove':
+    // (toLowerCase() is a IE fix)
+    switch (e.dataTransfer.effectAllowed.toLowerCase()) {
+      case 'copymove':
         if (!this.opts.clone) break
         dragging.el.show()
       case 'copy':
