@@ -269,10 +269,16 @@
     e.stopPropagation()
     e = e.originalEvent || e // zepto <> jquery compatibility
 
+    // toLowerCase() is a IE fix
+    var effectAllowed = e.dataTransfer.effectAllowed.toLowerCase()
+    // Safari fix
+    if (effectAllowed === 'all') {
+      effectAllowed = 'copymove'
+    }
+
     // hide placeholder, if set (e.g. enter the droppable after
     // entering a sortable)
-    // (toLowerCase() is a IE fix)
-    if (dragging.placeholder && !(e.dataTransfer.effectAllowed.toLowerCase() === 'copymove' && this.opts.clone)) {
+    if (dragging.placeholder && !(effectAllowed === 'copymove' && this.opts.clone)) {
       dragging.placeholder.hide()
     }
 
@@ -313,6 +319,8 @@
 
     // (toLowerCase() is a IE fix)
     switch (e.dataTransfer.effectAllowed.toLowerCase()) {
+      // all is a Safari fix
+      case 'all':
       case 'copymove':
         if (!this.opts.clone) break
         dragging.el.show()
