@@ -471,6 +471,8 @@
 
     e.stopPropagation()
 
+    var target = e.currentTarget
+
     e = e.originalEvent || e // zepto <> jquery compatibility
     e.dataTransfer.effectAllowed = 'copyMove'
     try { // IE fix
@@ -478,7 +480,7 @@
       e.dataTransfer.setData('text/plain', '42')
     } catch(e) {}
 
-    dragging.start(this, $(e.target)).addClass('dragging')
+    dragging.start(this, $(target)).addClass('dragging')
     this.index = dragging.el.index()
 
     if (this.opts.forcePlaceholderSize) {
