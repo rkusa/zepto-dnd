@@ -400,10 +400,11 @@
   }
 
   Droppable.prototype.over = function(e) {
+    e.stopPropagation()
+
     if (!this.accept || this.opts.disabled) return
 
     e.preventDefault() // allow drop
-    e.stopPropagation()
 
     e = e.originalEvent || e // zepto <> jquery compatibility
     e.dataTransfer.dropEffect = 'copyMove'
