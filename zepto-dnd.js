@@ -1,5 +1,73 @@
 !function($) {
   var nextId = 0
+
+  var needScroller = navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0;
+
+  var Scroller = function() {
+  };
+
+  Scroller.prototype.scrollEvent = function(element, originalEvent) {
+    var event = new CustomEvent('dragscroll', {
+      detail: {
+        element: [ $(element) ],
+        originalEvent: originalEvent
+      }
+    });
+    document.dispatchEvent(event);
+  };
+
+  Scroller.prototype.scroll = function(e) {
+    var
+      d = e.detail,
+      originalEvent = d.originalEvent.originalEvent || d.originalEvent,
+      winWidth = window.innerWidth,
+      winHeight = window.innerHeight,
+      scrollSpeed = 5,
+      scrollSensitivity = 50,
+      step = 20,
+      x,
+      y
+
+    e.stopPropagation();
+
+    if (originalEvent.pageY) {
+      y = originalEvent.pageY - window.pageYOffset
+    }
+
+    if (originalEvent.pageX) {
+      x = originalEvent.pageX - window.pageXOffset
+    }
+
+    var moveY;
+    if (y >= winHeight - scrollSensitivity) {
+      moveY = window.scrollY + step;
+    } else if (y <= scrollSensitivity) {
+      moveY = window.scrollY - step;
+    }
+
+    var moveX;
+    if (x >= winWidth - scrollSensitivity) {
+      moveX = window.scrollX + step;
+    } else if (x <= scrollSensitivity) {
+      moveX = window.scrollX - step;
+    }
+
+    if (moveX) {
+      window.scrollTo(moveX, window.pageYOffset);
+    } else if (moveY) {
+      window.scrollTo(window.pageXOffset, moveY);
+    }
+  };
+
+  if (needScroller) {
+    // https://github.com/rkusa/zepto-dnd/issues/19#issuecomment-77806753
+    var scroller = new Scroller();
+    document.addEventListener('dragover', function(e) {
+      scroller.scrollEvent(e.explicitOriginalTarget, e);
+    });
+    document.addEventListener('dragscroll', scroller.scroll.bind(scroller));
+  };
+
   var Dragging = function() {
     this.eventHandler = $('<div />')
     this.origin = this.el = null
@@ -454,6 +522,7 @@
     this.id   = nextId++
     this.el   = element
     this.opts = opts
+    this.scroller = needScroller && new Scroller()
 
     var tag
     try {
@@ -661,6 +730,9 @@
   }
 
   Sortable.prototype.over = function(e) {
+    if (this.scroller)
+      this.scroller.scrollEvent(this.el, e);
+
     if (!this.accept || this.opts.disabled) return
 
     e.preventDefault() // allow drop
