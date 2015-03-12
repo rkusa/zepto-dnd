@@ -97,6 +97,18 @@
     this.origin = origin
     this.el = el
     this.eventHandler.trigger('dragging:start')
+
+    if (origin.opts.clonePlaceholder) {
+      if (typeof origin.opts.clonePlaceholder === 'function') {
+        this.placeholder = origin.opts.clonePlaceholder.call(this);
+      } else if (origin.opts.clonePlaceholder === true) {
+        this.placeholder = $(this.el[0].cloneNode(true));
+        if (origin.opts.placeholder && this.placeholder) {
+          this.placeholder.addClass(origin.opts.placeholder);
+        }
+      }
+    }
+
     return this.el
   }
 
@@ -470,7 +482,11 @@
     // hide placeholder, if set (e.g. enter the droppable after
     // entering a sortable)
     if (dragging.placeholder && !(effectAllowed === 'copymove' && this.opts.clone)) {
-      dragging.placeholder.hide()
+      if (this.opts.clonePlaceholder) {
+        this.el.append(dragging.placeholder);
+      } else {
+        dragging.placeholder.hide();
+      }
     }
 
     if (this.opts.hoverClass && this.accept)
@@ -701,6 +717,10 @@
     // stop if event is fired on the placeholder
     var child = e.currentTarget, isContainer = child === this.el[0]
     if (child === this.placeholder[0]) return
+
+    if (dragging.placeholder) {
+      this.placeholder = dragging.placeholder;
+    }
 
     // the container fallback is only necessary for empty sortables
     if (isContainer && !this.isEmpty && this.placeholder.parent().length)
