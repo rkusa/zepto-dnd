@@ -69,7 +69,7 @@
     return this
   }
 
-  Dragging.prototype.start = function(origin, el) {
+  Dragging.prototype.start = function(origin, el, evt) {
     this.origin = origin
     this.el = el
     this.eventHandler.trigger('dragging:start')
@@ -83,6 +83,21 @@
           this.placeholder.addClass(origin.opts.placeholder);
         }
       }
+    }
+
+    this.dragImageEl = this.dragImageEl || document.createElement('img');
+    if (origin.opts.dragImage === false) {
+      // noop
+    } else if (typeof origin.opts.dragImage === 'string') {
+      this.dragImageEl.src = origin.opts.dragImage
+    } else if (origin.opts.dragImage instanceof HTMLElement) {
+      this.dragImageEl = origin.opts.dragImage;
+    } else {
+      delete this.dragImageEl;
+    }
+    if (this.dragImageEl) {
+      evt.dataTransfer.setDragImage(this.dragImageEl, 0, 0);
+      delete this.dragImageEl;
     }
 
     return this.el
@@ -355,7 +370,7 @@
       e.dataTransfer.setData('text/plain', '42')
     } catch(e) {}
 
-    dragging.start(this, this.el).addClass('dragging')
+    dragging.start(this, this.el, e).addClass('dragging')
   }
 
   Draggable.prototype.end = function(e) {
@@ -672,7 +687,7 @@
       e.dataTransfer.setData('text/plain', '42')
     } catch(e) {}
 
-    dragging.start(this, $(target)).addClass('dragging')
+    dragging.start(this, $(target), e).addClass('dragging')
     this.index = dragging.el.index()
 
     if (this.opts.forcePlaceholderSize) {
