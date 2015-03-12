@@ -81,6 +81,13 @@
     this.eventHandler.trigger('dragging:stop')
   }
 
+  Dragging.prototype.parentDraggable = function(state, args) {
+    if (this.opts.handle && args[0] && args[0].target) {
+      var $parent = $(args[0].target).closest(this.opts.items);
+      $parent.prop('draggable', state);
+    }
+  }
+
   var dragging = $.dragging = parent.$.dragging || new Dragging()
 
   // from https://github.com/rkusa/selector-observer
@@ -279,7 +286,6 @@
     this.el
     .on('dragstart', $.proxy(this.start, this))
     .on('dragend',   $.proxy(this.end, this))
-    .prop('draggable', true)
 
     // Prevents dragging from starting on specified elements.
     this.el
@@ -290,6 +296,8 @@
       this.el
       .on('mouseenter', this.opts.handle, $.proxy(this.enable, this))
       .on('mouseleave', this.opts.handle, $.proxy(this.disable, this))
+    } else {
+      this.el.prop('draggable', true)
     }
 
     var self = this
@@ -316,10 +324,12 @@
   }
 
   Draggable.prototype.enable = function() {
+    dragging.parentDraggable.call(this, true, arguments);
     this.opts.disabled = false
   }
 
   Draggable.prototype.disable = function() {
+    dragging.parentDraggable.call(this, false, arguments);
     this.opts.disabled = true
   }
 
@@ -525,7 +535,6 @@
     .on('dragover',  this.opts.items, $.proxy(this.over, this))
     .on('dragend',   this.opts.items, $.proxy(this.end, this))
     .on('drop',      this.opts.items, $.proxy(this.drop, this))
-    .find(this.opts.items).prop('draggable', true)
 
     this.el
     .on('dragenter',  $.proxy(this.enter, this))
@@ -539,6 +548,8 @@
       this.el
       .on('mouseenter', this.opts.handle, $.proxy(this.enable, this))
       .on('mouseleave', this.opts.handle, $.proxy(this.disable, this))
+    } else {
+      this.el.find(this.opts.items).prop('draggable', true)
     }
 
     dragging
@@ -551,7 +562,9 @@
     })
 
     this.observer = new SelectorObserver(this.el[0], this.opts.items, function() {
-      $(this).prop('draggable', true)
+      if (!self.opts.handle) {
+        $(this).prop('draggable', true)
+      }
     }, function() {
       if (this === self.placeholder[0]) {
         return // ignore placeholder
@@ -595,10 +608,12 @@
   }
 
   Sortable.prototype.enable = function() {
+    dragging.parentDraggable.call(this, true, arguments);
     this.opts.disabled = false
   }
 
   Sortable.prototype.disable = function() {
+    dragging.parentDraggable.call(this, false, arguments);
     this.opts.disabled = true
   }
 
