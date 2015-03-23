@@ -44,6 +44,10 @@
     }, true)
   }
 
+  var isDisabled = function() {
+    return this.state.disabled && this.opts.disabled;
+  }
+
   var Dragging = function() {
     this.eventHandler = $('<div />')
     this.origin = this.el = null
@@ -282,12 +286,17 @@
     this.el  = $(element)
     this.opts     = opts
     this.cancel   = opts.handle !== false
+    this.state         = {
+      disabled: opts.disabled
+    }
 
     this.connectedWith = []
     if (this.opts.connectWith) {
       this.connectWith(this.opts.connectWith)
     }
   }
+
+  Draggable.prototype.isDisabled = isDisabled
 
   Draggable.prototype.connectWith = function(connectWith) {
     var self = this
@@ -352,16 +361,16 @@
 
   Draggable.prototype.enable = function() {
     dragging.parentDraggable.call(this, true, arguments);
-    this.opts.disabled = false
+    this.state.disabled = false
   }
 
   Draggable.prototype.disable = function() {
     dragging.parentDraggable.call(this, false, arguments);
-    this.opts.disabled = true
+    this.state.disabled = true
   }
 
   Draggable.prototype.start = function(e) {
-    if (this.opts.disabled) return false
+    if (this.isDisabled()) return false
 
     e = e.originalEvent || e // zepto <> jquery compatibility
     e.dataTransfer.effectAllowed = 'copy'
@@ -390,7 +399,12 @@
     this.opts          = opts
     this.accept        = false
     this.connectedWith = []
+    this.state         = {
+      disabled: opts.disabled
+    }
   }
+
+  Droppable.prototype.isDisabled = isDisabled
 
   Droppable.prototype.create = function() {
     this.el
@@ -423,11 +437,11 @@
   }
 
   Droppable.prototype.enable = function() {
-    this.opts.disabled = false
+    this.state.disabled = false
   }
 
   Droppable.prototype.disable = function() {
-    this.opts.disabled = true
+    this.state.disabled = true
   }
 
   Droppable.prototype.activate = function(e) {
@@ -458,7 +472,7 @@
   }
 
   Droppable.prototype.enter = function(e) {
-    if (this.opts.disabled) return false
+    if (this.isDisabled()) return false
 
     e.stopPropagation()
     e = e.originalEvent || e // zepto <> jquery compatibility
@@ -487,7 +501,7 @@
   Droppable.prototype.over = function(e) {
     e.stopPropagation()
 
-    if (!this.accept || this.opts.disabled) return
+    if (!this.accept || this.isDisabled()) return
 
     e.preventDefault() // allow drop
 
@@ -496,7 +510,7 @@
   }
 
   Droppable.prototype.leave = function(e) {
-    if (this.opts.disabled) return false
+    if (this.isDisabled()) return false
     // e.stopPropagation()
 
     if (this.opts.hoverClass && this.accept)
@@ -504,7 +518,7 @@
   }
 
   Droppable.prototype.drop = function(e) {
-    if (this.opts.disabled) return false
+    if (this.isDisabled()) return false
 
     e.stopPropagation() // stops the browser from redirecting.
     e.preventDefault()
@@ -539,6 +553,9 @@
     this.id   = nextId++
     this.el   = element
     this.opts = opts
+    this.state = {
+      disabled: opts.disabled
+    }
 
     var tag
     try {
@@ -558,6 +575,8 @@
   }
 
   Sortable.prototype.connectWith = Draggable.prototype.connectWith
+
+  Sortable.prototype.isDisabled = isDisabled
 
   Sortable.prototype.create = function() {
     this.el
@@ -640,12 +659,12 @@
 
   Sortable.prototype.enable = function() {
     dragging.parentDraggable.call(this, true, arguments);
-    this.opts.disabled = false
+    this.state.disabled = false
   }
 
   Sortable.prototype.disable = function() {
     dragging.parentDraggable.call(this, false, arguments);
-    this.opts.disabled = true
+    this.state.disabled = true
   }
 
   Sortable.prototype.activate = function(e) {
@@ -674,7 +693,7 @@
   }
 
   Sortable.prototype.start = function(e) {
-    if (this.opts.disabled) return false
+    if (this.isDisabled()) return false
 
     e.stopPropagation()
 
@@ -699,7 +718,7 @@
   }
 
   Sortable.prototype.enter = function(e) {
-    if (!this.accept || this.opts.disabled) return
+    if (!this.accept || this.isDisabled()) return
 
     e.preventDefault()
     e.stopPropagation()
@@ -755,7 +774,7 @@
   }
 
   Sortable.prototype.over = function(e) {
-    if (!this.accept || this.opts.disabled) return
+    if (!this.accept || this.isDisabled()) return
 
     e.preventDefault() // allow drop
     e.stopPropagation()
@@ -792,6 +811,9 @@
     if (e.dataTransfer.effectAllowed === 'copy')
       dragging.el = dragging.el.clone()
 
+    if (this.opts.handle) {
+      dragging.el.prop('draggable', false)
+    }
     dragging.el.insertBefore(this.placeholder).show()
 
     // remove placeholder to be able to calculate new index
