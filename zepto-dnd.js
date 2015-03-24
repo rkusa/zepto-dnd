@@ -108,13 +108,6 @@
     this.eventHandler.trigger('dragging:stop')
   }
 
-  Dragging.prototype.parentDraggable = function(state, args) {
-    if (this.opts.handle && args[0] && args[0].target) {
-      var $parent = $(args[0].target).closest(this.opts.items);
-      $parent.prop('draggable', state);
-    }
-  }
-
   var dragging = $.dragging = parent.$.dragging || new Dragging()
 
   // from https://github.com/rkusa/selector-observer
@@ -311,20 +304,22 @@
 
   Draggable.prototype.create = function() {
     this.el
+    .on('mousedown', $.proxy(this.before, this))
+    .on('mouseup',   $.proxy(this.after, this))
     .on('dragstart', $.proxy(this.start, this))
     .on('dragend',   $.proxy(this.end, this))
 
     // Prevents dragging from starting on specified elements.
-    this.el
-    .on('mouseenter', this.opts.cancel, $.proxy(this.disable, this))
-    .on('mouseleave', this.opts.cancel, $.proxy(this.enable, this))
+    if (this.opts.cancel) {
+      this.el
+      .on('mouseenter', this.opts.cancel, $.proxy(this.forbid, this))
+      .on('mouseleave', this.opts.cancel, $.proxy(this.allow, this))
+    }
 
     if (this.opts.handle) {
       this.el
-      .on('mouseenter', this.opts.handle, $.proxy(this.enable, this))
-      .on('mouseleave', this.opts.handle, $.proxy(this.disable, this))
-    } else {
-      this.el.prop('draggable', true)
+      .on('mouseenter', this.opts.handle, $.proxy(this.allow, this))
+      .on('mouseleave', this.opts.handle, $.proxy(this.forbid, this))
     }
 
     var self = this
@@ -335,33 +330,52 @@
 
   Draggable.prototype.destroy = function() {
     this.el
+    .off('mousedown', this.before)
+    .off('mouseup',   this.after)
     .off('dragstart', this.start)
     .off('dragend',   this.end)
-    .prop('draggable', false)
 
-    this.el
-    .off('mouseenter', this.opts.cancel, this.disable)
-    .off('mouseleave', this.opts.cancel, this.enable)
+    if (this.opts.cancel) {
+      this.el
+      .off('mouseenter', this.opts.cancel, this.forbid)
+      .off('mouseleave', this.opts.cancel, this.allow)
+    }
 
     if (this.opts.handle) {
       this.el
-      .off('mouseenter', this.opts.handle, this.enable)
-      .off('mouseleave', this.opts.handle, this.disable)
+      .off('mouseenter', this.opts.handle, this.allow)
+      .off('mouseleave', this.opts.handle, this.forbid)
     }
   }
 
   Draggable.prototype.enable = function() {
-    dragging.parentDraggable.call(this, true, arguments);
     this.opts.disabled = false
   }
 
   Draggable.prototype.disable = function() {
-    dragging.parentDraggable.call(this, false, arguments);
     this.opts.disabled = true
   }
 
+  Draggable.prototype.allow = function() {
+    this.cancel = false
+  }
+
+  Draggable.prototype.forbid = function() {
+    this.cancel = true
+  }
+
+  Draggable.prototype.before = function(e) {
+    if (!this.cancel) {
+      this.el.prop('draggable', true)
+    }
+  }
+
+  Draggable.prototype.after = function(e) {
+    this.el.prop('draggable', false)
+  }
+
   Draggable.prototype.start = function(e) {
-    if (this.opts.disabled) return false
+    if (this.opts.disabled || this.cancel) return false
 
     e = e.originalEvent || e // zepto <> jquery compatibility
     e.dataTransfer.effectAllowed = 'copy'
@@ -536,9 +550,10 @@
   }
 
   var Sortable = function(element, opts) {
-    this.id   = nextId++
-    this.el   = element
-    this.opts = opts
+    this.id     = nextId++
+    this.el     = element
+    this.opts   = opts
+    this.cancel = this.opts.handle !== false
 
     var tag
     try {
@@ -561,6 +576,8 @@
 
   Sortable.prototype.create = function() {
     this.el
+    .on('mousedown', this.opts.items, $.proxy(this.before, this))
+    .on('mouseup',   this.opts.items, $.proxy(this.after, this))
     .on('dragstart', this.opts.items, $.proxy(this.start, this))
     .on('dragenter', this.opts.items, $.proxy(this.enter, this))
     .on('dragover',  this.opts.items, $.proxy(this.over, this))
@@ -572,13 +589,17 @@
     .on('dragover',   $.proxy(this.over, this))
     .on('dragend',    $.proxy(this.end, this))
     .on('drop',       $.proxy(this.drop, this))
-    .on('mouseenter', this.opts.cancel, $.proxy(this.disable, this))
-    .on('mouseleave', this.opts.cancel, $.proxy(this.enable, this))
+
+    if (this.opts.cancel) {
+      this.el
+      .on('mouseenter', this.opts.cancel, $.proxy(this.forbid, this))
+      .on('mouseleave', this.opts.cancel, $.proxy(this.allow, this))
+    }
 
     if (this.opts.handle) {
       this.el
-      .on('mouseenter', this.opts.handle, $.proxy(this.enable, this))
-      .on('mouseleave', this.opts.handle, $.proxy(this.disable, this))
+      .on('mouseenter', this.opts.handle, $.proxy(this.allow, this))
+      .on('mouseleave', this.opts.handle, $.proxy(this.forbid, this))
     } else {
       this.el.find(this.opts.items).prop('draggable', true)
     }
@@ -609,6 +630,8 @@
 
   Sortable.prototype.destroy = function() {
     this.el
+    .off('mousedown', this.opts.items, this.before)
+    .off('mouseup',   this.opts.items, this.after)
     .off('dragstart', this.opts.items, this.start)
     .off('dragenter', this.opts.items, this.enter)
     .off('dragover',  this.opts.items, this.over)
@@ -621,13 +644,17 @@
     .off('dragover',   this.over)
     .off('dragend',    this.end)
     .off('drop',       this.drop)
-    .off('mouseenter', this.opts.cancel, this.disable)
-    .off('mouseleave', this.opts.cancel, this.enable)
+
+    if (this.opts.cancel) {
+      this.el
+      .off('mouseenter', this.opts.cancel, this.forbid)
+      .off('mouseleave', this.opts.cancel, this.allow)
+    }
 
     if (this.opts.handle) {
       this.el
-      .off('mouseenter', this.opts.handle, this.enable)
-      .off('mouseleave', this.opts.handle, this.disable)
+      .off('mouseenter', this.opts.handle, this.allow)
+      .off('mouseleave', this.opts.handle, this.forbid)
     }
 
     // Todo: Fix Zepto Bug
@@ -638,15 +665,10 @@
     this.observer.disconnect()
   }
 
-  Sortable.prototype.enable = function() {
-    dragging.parentDraggable.call(this, true, arguments);
-    this.opts.disabled = false
-  }
-
-  Sortable.prototype.disable = function() {
-    dragging.parentDraggable.call(this, false, arguments);
-    this.opts.disabled = true
-  }
+  Sortable.prototype.enable  = Draggable.prototype.enable
+  Sortable.prototype.disable = Draggable.prototype.disable
+  Sortable.prototype.allow   = Draggable.prototype.allow
+  Sortable.prototype.forbid  = Draggable.prototype.forbid
 
   Sortable.prototype.activate = function(e) {
     this.accept  = dragging.origin.id === this.id
@@ -673,8 +695,18 @@
     this.el.trigger('sortable:deactivate', dragging.el)
   }
 
+  Sortable.prototype.before = function(e) {
+    if (!this.cancel) {
+      $(e.currentTarget).prop('draggable', true)
+    }
+  }
+
+  Sortable.prototype.after = function(e) {
+    $(e.currentTarget).prop('draggable', false)
+  }
+
   Sortable.prototype.start = function(e) {
-    if (this.opts.disabled) return false
+    if (this.opts.disabled || this.cancel) return false
 
     e.stopPropagation()
 
@@ -699,7 +731,7 @@
   }
 
   Sortable.prototype.enter = function(e) {
-    if (!this.accept || this.opts.disabled) return
+    if (!this.accept || this.opts.disabled || this.cancel) return
 
     e.preventDefault()
     e.stopPropagation()
@@ -755,7 +787,7 @@
   }
 
   Sortable.prototype.over = function(e) {
-    if (!this.accept || this.opts.disabled) return
+    if (!this.accept || this.opts.disabled || this.cancel) return
 
     e.preventDefault() // allow drop
     e.stopPropagation()
