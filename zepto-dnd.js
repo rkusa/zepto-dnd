@@ -731,7 +731,7 @@
   }
 
   Sortable.prototype.enter = function(e) {
-    if (!this.accept || this.opts.disabled || this.cancel) return
+    if (!this.accept || this.opts.disabled) return
 
     e.preventDefault()
     e.stopPropagation()
@@ -787,7 +787,7 @@
   }
 
   Sortable.prototype.over = function(e) {
-    if (!this.accept || this.opts.disabled || this.cancel) return
+    if (!this.accept || this.opts.disabled) return
 
     e.preventDefault() // allow drop
     e.stopPropagation()
