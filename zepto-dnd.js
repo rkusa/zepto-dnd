@@ -378,7 +378,7 @@
     if (this.opts.disabled || this.cancel) return false
 
     e = e.originalEvent || e // zepto <> jquery compatibility
-    e.dataTransfer.effectAllowed = 'copy'
+    
     try { // IE fix
       // FF fix: set some data ....
       e.dataTransfer.setData('text/plain', '42')
