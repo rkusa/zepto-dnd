@@ -1,6 +1,4 @@
 !function($) {
-  var nextId = 0
-
   // workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=505521#c8
   // (https://github.com/rkusa/zepto-dnd/issues/19#issuecomment-77806753)
   var isFirefox = navigator.userAgent.toLowerCase().indexOf('gecko/') > -1
@@ -47,6 +45,7 @@
   var Dragging = function() {
     this.eventHandler = $('<div />')
     this.origin = this.el = null
+    this.nextId = 0
 
     var placeholder
     Object.defineProperty(this, 'placeholder', {
@@ -271,7 +270,7 @@
   }
 
   var Draggable = function(element, opts) {
-    this.id       = nextId++
+    this.id       = dragging.nextId++
     this.el  = $(element)
     this.opts     = opts
     this.cancel   = opts.handle !== false
@@ -378,7 +377,7 @@
     if (this.opts.disabled || this.cancel) return false
 
     e = e.originalEvent || e // zepto <> jquery compatibility
-    
+
     try { // IE fix
       // FF fix: set some data ....
       e.dataTransfer.setData('text/plain', '42')
@@ -399,7 +398,7 @@
   }
 
   var Droppable = function(element, opts) {
-    this.id            = nextId++
+    this.id            = dragging.nextId++
     this.el            = $(element)
     this.opts          = opts
     this.accept        = false
@@ -550,7 +549,7 @@
   }
 
   var Sortable = function(element, opts) {
-    this.id     = nextId++
+    this.id     = dragging.nextId++
     this.el     = element
     this.opts   = opts
     this.cancel = this.opts.handle !== false
