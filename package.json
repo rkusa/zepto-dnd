@@ -6,15 +6,22 @@
   },
   "version": "1.3.1",
   "description": "HTML5 Drag'n'Drop API based Draggable, Droppable and Sortable for Zepto.js (and jQuery)",
-  "keywords": ["dnd", "draggable", "droppable", "sortable", "Zepto.js", "jQuery"],
+  "keywords": [
+    "dnd",
+    "draggable",
+    "droppable",
+    "sortable",
+    "Zepto.js",
+    "jQuery"
+  ],
   "homepage": "https://github.com/rkusa/zepto-dnd",
   "devDependencies": {
-    "uglify-js": "2.x.x"
+    "uglify-js": "^2.6"
   },
   "bugs": "https://github.com/rkusa/zepto-dnd/issues",
-  "repository" : {
-    "type" : "git",
-    "url" : "git://github.com/rkusa/zepto-dnd.git"
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rkusa/zepto-dnd.git"
   },
   "scripts": {
     "prepublish": "uglifyjs --source-map zepto-dnd.min.map -o zepto-dnd.min.js zepto-dnd.js"
